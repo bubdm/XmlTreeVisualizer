@@ -10,32 +10,22 @@ using System.Linq;
 using MindFusion.Diagramming;
 using MindFusion.Diagramming.Layout;
 using MindFusion.Diagramming.WinForms;
+using Brush = MindFusion.Drawing.Brush;
 
 namespace XmlTreeViewer
 {
     public partial class MainForm : Form
     {
         private Random random = new Random();
-        private MindFusion.Drawing.Brush[] brushes;
         private RectangleF nodeBounds = new RectangleF(0, 0, 40, 20);
-        
+        private Brush rootBrush = new MindFusion.Drawing.SolidBrush(Color.FromArgb(124, 139, 193));
+        private Brush nodeBrush = new MindFusion.Drawing.SolidBrush(Color.FromArgb(139, 180, 229));
+        private Brush leafBrush = new MindFusion.Drawing.SolidBrush(Color.FromArgb(185, 200, 255));
+
         public MainForm()
         {
             InitializeComponent();
-
-            brushes = new MindFusion.Drawing.Brush[]
-            {
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(227, 204, 255)),
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(185, 128, 255)),
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(155, 73, 255)),
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(139, 66, 229)),
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(118, 56, 193)),
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(93, 43, 153)),
-                new MindFusion.Drawing.SolidBrush(Color.FromArgb(73, 34, 119))
-            };
-
             ShapeNode root = MainDiagram.Factory.CreateShapeNode(nodeBounds);
-            
             RandomTree(root, 4, 4);
             Arrange(MainDiagramView);
         }
@@ -43,11 +33,9 @@ namespace XmlTreeViewer
 
         private async void DownloadXmlBtn_Click(object sender, EventArgs e)
         {
-            bool success = Uri.TryCreate(UriTextbox.Text, UriKind.Absolute, out Uri uriToRawFile);
-            
-            if (!success)
+            if (!Uri.TryCreate(UriTextbox.Text, UriKind.Absolute, out Uri uriToRawFile))
                 return;
-
+            
             try
             {
                 saveFileDialog.ShowDialog();
@@ -95,7 +83,8 @@ namespace XmlTreeViewer
 
         private void MainForm_Resize(object sender, EventArgs e)
         {
-            MainDiagramView.ZoomToFit();
+            if (ZoomControl.ZoomFactor < 70.0f)
+                MainDiagramView.ZoomToFit();
         }
 
         /// <summary>
@@ -109,9 +98,19 @@ namespace XmlTreeViewer
 
             try
             {
-                MainDiagram.ClearAll();
+                var file = new FileInfo(chooseFileDialog.FileName);
+                if (file.Length > 100000)
+                {
+                    var dialogResult = MessageBox.Show(
+                        @"You are trying to process a large file, it may take a very long time. Are you sure?",
+                        @"File is very large", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Warning);
 
-                var diagramRoot = MainDiagram.Factory.CreateShapeNode(nodeBounds);
+                    if (dialogResult == DialogResult.No)
+                        return;
+                }
+
                 var xmlRoot = await Task.Run(() =>
                 {
                     var xmlDoc = new XmlDocument();
@@ -119,17 +118,25 @@ namespace XmlTreeViewer
                     return xmlDoc.DocumentElement;
                 });
 
-                diagramRoot.Text = xmlRoot.Name;
-                ParseNode(xmlRoot, diagramRoot);
+                MainDiagram.ClearAll();
+                var diagramRoot = MainDiagram.Factory.CreateShapeNode(nodeBounds);
+                diagramRoot.EnableStyledText = true;
+                diagramRoot.Text = $"<b>{xmlRoot.Name}</b>";
+                diagramRoot.Brush = rootBrush;
+                
+                ProcessNode(xmlRoot, diagramRoot);
                 Arrange(MainDiagramView);
             }
             catch (IOException)
             {
 
             }
-            catch (XmlException)
+            catch (XmlException ex)
             {
-
+                MessageBox.Show($@"Error in '{chooseFileDialog.FileName}': {ex.Message}",
+                    @"XML file is not valid",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
@@ -139,7 +146,7 @@ namespace XmlTreeViewer
         /// </summary>
         /// <param name="xmlRoot">The root to start from (usually the root of XML document)</param>
         /// <param name="diagramRoot"></param>
-        private void ParseNode(XmlNode xmlRoot, DiagramNode diagramRoot)
+        private void ProcessNode(XmlNode xmlRoot, DiagramNode diagramRoot)
         {
             Diagram diagram = diagramRoot.Parent;
 
@@ -149,12 +156,12 @@ namespace XmlTreeViewer
                 {
                     ShapeNode diagramChild = XmlToShapeNode(xmlChild, diagram);
                     diagram.Factory.CreateDiagramLink(diagramRoot, diagramChild);
-                    ParseNode(xmlChild, diagramChild);
+                    ProcessNode(xmlChild, diagramChild);
                 }
-                else
+                else if (!string.IsNullOrWhiteSpace(xmlChild.InnerText))
                 {
                     ShapeNode diagramTextChild = diagram.Factory.CreateShapeNode(nodeBounds);
-                    diagramTextChild.Brush = new MindFusion.Drawing.SolidBrush(Color.FromArgb(170, 9, 22));
+                    diagramTextChild.Brush = leafBrush;
                     diagramTextChild.Text = xmlChild.InnerText;
                     diagram.Factory.CreateDiagramLink(diagramRoot, diagramTextChild);
                 }
@@ -180,6 +187,7 @@ namespace XmlTreeViewer
 
             resultNode.Text = $"<b>{xmlNode.Name}</b>\n{attributes}";
             resultNode.ResizeToFitText(FitSize.KeepRatio);
+            resultNode.Brush = nodeBrush;
 
             return resultNode;
         }
@@ -202,7 +210,6 @@ namespace XmlTreeViewer
             {
                 ShapeNode child = dgm.Factory.CreateShapeNode(nodeBounds);
                 var link = dgm.Factory.CreateDiagramLink(root, child);
-                child.Brush = brushes[depth % brushes.Length];
 
                 RandomTree(child, depth - 1, maxChildren);
             }
@@ -224,6 +231,10 @@ namespace XmlTreeViewer
         private void ChooseFileBtn_Click(object sender, EventArgs e)
         {
             chooseFileDialog.ShowDialog();
+
+            if (string.IsNullOrEmpty(chooseFileDialog.FileName))
+                return;
+
             var file = new FileInfo(chooseFileDialog.FileName);
 
             if (file.Exists)
@@ -234,6 +245,9 @@ namespace XmlTreeViewer
 
         private void ChosenFileLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            if (string.IsNullOrEmpty(chooseFileDialog.FileName))
+                return;
+            
             var file = new FileInfo(chooseFileDialog.FileName);
 
             if (file.Exists)

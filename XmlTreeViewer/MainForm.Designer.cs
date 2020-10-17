@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.MainLayout = new System.Windows.Forms.TableLayoutPanel();
             this.ControlPanel = new System.Windows.Forms.Panel();
             this.ControlsLayout = new System.Windows.Forms.TableLayoutPanel();
@@ -45,6 +46,7 @@
             this.MainDiagram = new MindFusion.Diagramming.Diagram();
             this.chooseFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            this.ZoomControl = new MindFusion.Common.WinForms.ZoomControl();
             this.MainLayout.SuspendLayout();
             this.ControlPanel.SuspendLayout();
             this.ControlsLayout.SuspendLayout();
@@ -147,6 +149,7 @@
             // DownloadFilePanel
             // 
             this.DownloadFilePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.DownloadFilePanel.Controls.Add(this.ZoomControl);
             this.DownloadFilePanel.Controls.Add(this.UriTextbox);
             this.DownloadFilePanel.Controls.Add(this.DownloadBar);
             this.DownloadFilePanel.Controls.Add(this.DownloadXmlBtn);
@@ -237,12 +240,25 @@
             this.saveFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
             this.saveFileDialog.Title = "Choose where to save a file";
             // 
+            // ZoomControl
+            // 
+            this.ZoomControl.BackColor = System.Drawing.Color.Transparent;
+            this.ZoomControl.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.ZoomControl.Location = new System.Drawing.Point(0, 245);
+            this.ZoomControl.Name = "ZoomControl";
+            this.ZoomControl.Padding = new System.Windows.Forms.Padding(5);
+            this.ZoomControl.Size = new System.Drawing.Size(159, 150);
+            this.ZoomControl.TabIndex = 7;
+            this.ZoomControl.Target = this.MainDiagramView;
+            this.ZoomControl.TickPosition = MindFusion.Common.WinForms.TickPosition.Left;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(827, 511);
             this.Controls.Add(this.MainLayout);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "XML Tree Visualizer";
             this.Resize += new System.EventHandler(this.MainForm_Resize);
@@ -277,6 +293,7 @@
         private System.Windows.Forms.TextBox UriTextbox;
         private System.Windows.Forms.Panel DownloadFilePanel;
         private System.Windows.Forms.SaveFileDialog saveFileDialog;
+        private MindFusion.Common.WinForms.ZoomControl ZoomControl;
     }
 }
 
