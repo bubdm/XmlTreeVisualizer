@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30517.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlTreeVisualizer", "XmlTreeViewer\XmlTreeVisualizer.csproj", "{19008588-E6E2-4142-94DC-4505AF971EF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XmlTreeVisualizer", "XmlTreeVisualizer\XmlTreeVisualizer.csproj", "{19008588-E6E2-4142-94DC-4505AF971EF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

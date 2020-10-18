@@ -37,16 +37,16 @@
             this.ChooseFileBtn = new System.Windows.Forms.Button();
             this.ParseTreeBtn = new System.Windows.Forms.Button();
             this.DownloadFilePanel = new System.Windows.Forms.Panel();
+            this.ZoomControl = new MindFusion.Common.WinForms.ZoomControl();
+            this.MainDiagramView = new MindFusion.Diagramming.WinForms.DiagramView();
+            this.MainDiagram = new MindFusion.Diagramming.Diagram();
             this.UriTextbox = new System.Windows.Forms.TextBox();
             this.DownloadBar = new System.Windows.Forms.ProgressBar();
             this.DownloadXmlBtn = new System.Windows.Forms.Button();
             this.DownloadingLabel = new System.Windows.Forms.Label();
             this.VisualizePanel = new System.Windows.Forms.Panel();
-            this.MainDiagramView = new MindFusion.Diagramming.WinForms.DiagramView();
-            this.MainDiagram = new MindFusion.Diagramming.Diagram();
             this.chooseFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this.ZoomControl = new MindFusion.Common.WinForms.ZoomControl();
             this.MainLayout.SuspendLayout();
             this.ControlPanel.SuspendLayout();
             this.ControlsLayout.SuspendLayout();
@@ -144,7 +144,7 @@
             this.ParseTreeBtn.TabIndex = 5;
             this.ParseTreeBtn.Text = "Draw XML tree";
             this.ParseTreeBtn.UseVisualStyleBackColor = true;
-            this.ParseTreeBtn.Click += new System.EventHandler(this.RenderTreeBtn_Click);
+            this.ParseTreeBtn.Click += new System.EventHandler(this.DrawTreeBtn_Click);
             // 
             // DownloadFilePanel
             // 
@@ -160,19 +160,50 @@
             this.DownloadFilePanel.Size = new System.Drawing.Size(161, 397);
             this.DownloadFilePanel.TabIndex = 7;
             // 
+            // ZoomControl
+            // 
+            this.ZoomControl.BackColor = System.Drawing.Color.Transparent;
+            this.ZoomControl.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.ZoomControl.Location = new System.Drawing.Point(0, 245);
+            this.ZoomControl.Name = "ZoomControl";
+            this.ZoomControl.Padding = new System.Windows.Forms.Padding(5);
+            this.ZoomControl.Size = new System.Drawing.Size(159, 150);
+            this.ZoomControl.TabIndex = 7;
+            this.ZoomControl.Target = this.MainDiagramView;
+            this.ZoomControl.TickPosition = MindFusion.Common.WinForms.TickPosition.Left;
+            // 
+            // MainDiagramView
+            // 
+            this.MainDiagramView.Behavior = MindFusion.Diagramming.Behavior.Pan;
+            this.MainDiagramView.Diagram = this.MainDiagram;
+            this.MainDiagramView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainDiagramView.LicenseKey = null;
+            this.MainDiagramView.Location = new System.Drawing.Point(0, 0);
+            this.MainDiagramView.Name = "MainDiagramView";
+            this.MainDiagramView.PrintOptions.DocumentName = "";
+            this.MainDiagramView.PrintOptions.MeasureUnit = MindFusion.Diagramming.MeasureUnit.Millimeter;
+            this.MainDiagramView.PrintOptions.RenderTarget = MindFusion.Diagramming.RenderTarget.Printer;
+            this.MainDiagramView.Size = new System.Drawing.Size(644, 503);
+            this.MainDiagramView.TabIndex = 3;
+            this.MainDiagramView.Text = "diagramView";
+            // 
+            // MainDiagram
+            // 
+            this.MainDiagram.TouchThreshold = 0F;
+            // 
             // UriTextbox
             // 
             this.UriTextbox.Font = new System.Drawing.Font("Candara", 9F);
-            this.UriTextbox.Location = new System.Drawing.Point(4, 6);
+            this.UriTextbox.Location = new System.Drawing.Point(4, 5);
             this.UriTextbox.Name = "UriTextbox";
             this.UriTextbox.Size = new System.Drawing.Size(152, 22);
             this.UriTextbox.TabIndex = 6;
-            this.UriTextbox.Text = "https://raw.githubusercontent.com/kizeevov/elcomplusfiles/main/config.xml";
+            this.UriTextbox.Text = "<paste URI here>";
             // 
             // DownloadBar
             // 
             this.DownloadBar.Enabled = false;
-            this.DownloadBar.Location = new System.Drawing.Point(5, 83);
+            this.DownloadBar.Location = new System.Drawing.Point(5, 82);
             this.DownloadBar.Margin = new System.Windows.Forms.Padding(0, 3, 0, 10);
             this.DownloadBar.Name = "DownloadBar";
             this.DownloadBar.Size = new System.Drawing.Size(152, 23);
@@ -184,7 +215,7 @@
             this.DownloadXmlBtn.FlatAppearance.BorderSize = 0;
             this.DownloadXmlBtn.Font = new System.Drawing.Font("Candara", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.DownloadXmlBtn.ForeColor = System.Drawing.Color.Black;
-            this.DownloadXmlBtn.Location = new System.Drawing.Point(3, 29);
+            this.DownloadXmlBtn.Location = new System.Drawing.Point(3, 28);
             this.DownloadXmlBtn.Name = "DownloadXmlBtn";
             this.DownloadXmlBtn.Size = new System.Drawing.Size(153, 27);
             this.DownloadXmlBtn.TabIndex = 1;
@@ -197,7 +228,7 @@
             this.DownloadingLabel.AutoSize = true;
             this.DownloadingLabel.Enabled = false;
             this.DownloadingLabel.Font = new System.Drawing.Font("Candara", 9F);
-            this.DownloadingLabel.Location = new System.Drawing.Point(4, 65);
+            this.DownloadingLabel.Location = new System.Drawing.Point(4, 64);
             this.DownloadingLabel.Margin = new System.Windows.Forms.Padding(3, 55, 3, 0);
             this.DownloadingLabel.Name = "DownloadingLabel";
             this.DownloadingLabel.Size = new System.Drawing.Size(86, 14);
@@ -215,21 +246,6 @@
             this.VisualizePanel.Size = new System.Drawing.Size(646, 505);
             this.VisualizePanel.TabIndex = 4;
             // 
-            // MainDiagramView
-            // 
-            this.MainDiagramView.Diagram = this.MainDiagram;
-            this.MainDiagramView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainDiagramView.LicenseKey = null;
-            this.MainDiagramView.Location = new System.Drawing.Point(0, 0);
-            this.MainDiagramView.Name = "MainDiagramView";
-            this.MainDiagramView.Size = new System.Drawing.Size(644, 503);
-            this.MainDiagramView.TabIndex = 3;
-            this.MainDiagramView.Text = "diagramView1";
-            // 
-            // MainDiagram
-            // 
-            this.MainDiagram.TouchThreshold = 0F;
-            // 
             // chooseFileDialog
             // 
             this.chooseFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
@@ -240,18 +256,6 @@
             this.saveFileDialog.Filter = "XML files (*.xml)|*.xml|All files (*.*)|*.*";
             this.saveFileDialog.Title = "Choose where to save a file";
             // 
-            // ZoomControl
-            // 
-            this.ZoomControl.BackColor = System.Drawing.Color.Transparent;
-            this.ZoomControl.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ZoomControl.Location = new System.Drawing.Point(0, 245);
-            this.ZoomControl.Name = "ZoomControl";
-            this.ZoomControl.Padding = new System.Windows.Forms.Padding(5);
-            this.ZoomControl.Size = new System.Drawing.Size(159, 150);
-            this.ZoomControl.TabIndex = 7;
-            this.ZoomControl.Target = this.MainDiagramView;
-            this.ZoomControl.TickPosition = MindFusion.Common.WinForms.TickPosition.Left;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -261,6 +265,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "XML Tree Visualizer";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.Resize += new System.EventHandler(this.MainForm_Resize);
             this.MainLayout.ResumeLayout(false);
             this.ControlPanel.ResumeLayout(false);
